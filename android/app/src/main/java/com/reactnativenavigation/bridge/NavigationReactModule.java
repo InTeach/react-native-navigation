@@ -1,8 +1,5 @@
 package com.reactnativenavigation.bridge;
 
-import android.app.Activity;
-import android.content.res.Configuration;
-
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -10,15 +7,16 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.controllers.NavigationCommandsHandler;
 import com.reactnativenavigation.params.ContextualMenuParams;
 import com.reactnativenavigation.params.FabParams;
+import com.reactnativenavigation.params.SlidingOverlayParams;
 import com.reactnativenavigation.params.SnackbarParams;
 import com.reactnativenavigation.params.TitleBarButtonParams;
 import com.reactnativenavigation.params.TitleBarLeftButtonParams;
 import com.reactnativenavigation.params.parsers.ContextualMenuParamsParser;
 import com.reactnativenavigation.params.parsers.FabParamsParser;
+import com.reactnativenavigation.params.parsers.SlidingOverlayParamsParser;
 import com.reactnativenavigation.params.parsers.SnackbarParamsParser;
 import com.reactnativenavigation.params.parsers.TitleBarButtonParamsParser;
 import com.reactnativenavigation.params.parsers.TitleBarLeftButtonParamsParser;
@@ -191,9 +189,25 @@ public class NavigationReactModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void showSlidingOverlay(final ReadableMap params) {
+        SlidingOverlayParams slidingOverlayParams = new SlidingOverlayParamsParser().parse(BundleConverter.toBundle(params));
+        NavigationCommandsHandler.showSlidingOverlay(slidingOverlayParams);
+    }
+
+    @ReactMethod
+    public void hideSlidingOverlay(final ReadableMap params) {
+        NavigationCommandsHandler.hideSlidingOverlay();
+    }
+
+    @ReactMethod
     public void showSnackbar(final ReadableMap params) {
         SnackbarParams snackbarParams = new SnackbarParamsParser().parse(BundleConverter.toBundle(params));
         NavigationCommandsHandler.showSnackbar(snackbarParams);
+    }
+
+    @ReactMethod
+    public void dismissSnackbar() {
+        NavigationCommandsHandler.dismissSnackbar();
     }
 
     @ReactMethod
@@ -210,23 +224,6 @@ public class NavigationReactModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getOrientation(Promise promise) {
-        Activity activity = getCurrentActivity();
-        if (activity != null) {
-            int orientation = getCurrentActivity().getResources().getConfiguration().orientation;
-            switch (orientation) {
-                case Configuration.ORIENTATION_PORTRAIT:
-                    promise.resolve("PORTRAIT");
-                    return;
-                case Configuration.ORIENTATION_LANDSCAPE:
-                    promise.resolve("LANDSCAPE");
-                    return;
-                case Configuration.ORIENTATION_UNDEFINED:
-                    promise.resolve("UNDEFINED");
-                    return;
-            }
-        } else {
-            promise.resolve("UNDEFINED");
-        }
+        NavigationCommandsHandler.getOrientation(promise);
     }
-
 }

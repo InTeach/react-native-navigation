@@ -4,16 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.params.ActivityParams;
 import com.reactnativenavigation.params.ContextualMenuParams;
 import com.reactnativenavigation.params.FabParams;
 import com.reactnativenavigation.params.ScreenParams;
+import com.reactnativenavigation.params.SlidingOverlayParams;
 import com.reactnativenavigation.params.SnackbarParams;
 import com.reactnativenavigation.params.TitleBarButtonParams;
 import com.reactnativenavigation.params.TitleBarLeftButtonParams;
 import com.reactnativenavigation.params.parsers.ActivityParamsParser;
 import com.reactnativenavigation.params.parsers.ScreenParamsParser;
+import com.reactnativenavigation.utils.Orientation;
 import com.reactnativenavigation.views.SideMenu.Side;
 
 import java.util.List;
@@ -336,6 +339,34 @@ public class NavigationCommandsHandler {
         });
     }
 
+    public static void showSlidingOverlay(final SlidingOverlayParams params) {
+        final NavigationActivity currentActivity = NavigationActivity.currentActivity;
+        if (currentActivity == null) {
+            return;
+        }
+
+        NavigationApplication.instance.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                currentActivity.showSlidingOverlay(params);
+            }
+        });
+    }
+
+    public static void hideSlidingOverlay() {
+        final NavigationActivity currentActivity = NavigationActivity.currentActivity;
+        if (currentActivity == null) {
+            return;
+        }
+
+        NavigationApplication.instance.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                currentActivity.hideSlidingOverlay();
+            }
+        });
+    }
+
     public static void showSnackbar(final SnackbarParams params) {
         final NavigationActivity currentActivity = NavigationActivity.currentActivity;
         if (currentActivity == null) {
@@ -376,5 +407,27 @@ public class NavigationCommandsHandler {
                 currentActivity.dismissContextualMenu(screenInstanceId);
             }
         });
+    }
+
+    public static void dismissSnackbar() {
+        final NavigationActivity currentActivity = NavigationActivity.currentActivity;
+        if (currentActivity == null) {
+            return;
+        }
+
+        NavigationApplication.instance.runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                currentActivity.dismissSnackbar();
+            }
+        });
+    }
+
+    public static void getOrientation(Promise promise) {
+        final NavigationActivity currentActivity = NavigationActivity.currentActivity;
+        if (currentActivity == null) {
+            return;
+        }
+        promise.resolve(Orientation.get(currentActivity));
     }
 }

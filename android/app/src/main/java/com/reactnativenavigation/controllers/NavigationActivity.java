@@ -116,9 +116,11 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
         IntentDataHandler.onResume(getIntent());
         getReactGateway().onResumeActivity(this, this);
         NavigationApplication.instance.getActivityCallbacks().onActivityResumed(this);
+        
         EventBus.instance.register(this);
         IntentDataHandler.onPostResume(getIntent());
     }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -130,6 +132,7 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     protected void onPause() {
         super.onPause();
         currentActivity = null;
+        IntentDataHandler.onPause(getIntent());
         NavigationApplication.instance.getReactGateway().onPauseActivity();
         NavigationApplication.instance.getActivityCallbacks().onActivityPaused(this);
         EventBus.instance.unregister(this);

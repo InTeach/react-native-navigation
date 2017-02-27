@@ -269,5 +269,10 @@
   }
 }
 
-
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window{
+  return UIInterfaceOrientationMaskPortrait;
+}
+- (BOOL) shouldAutorotate {
+  return NO;
+}
 @end

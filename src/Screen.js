@@ -7,10 +7,6 @@ import {
 } from 'react-native';
 import platformSpecific from './deprecated/platformSpecificDeprecated';
 import Navigation from './Navigation';
-import _ from 'lodash';
-
-
-const _allNavigatorEventHandlers = {};
 
 const NavigationSpecific = {
   push: platformSpecific.navigatorPush,
@@ -26,24 +22,9 @@ class Navigator {
     this.navigatorEventID = navigatorEventID;
     this.navigatorEventHandler = null;
     this.navigatorEventSubscription = null;
-    this._lastAction = {params: undefined, timestamp: 0};
   }
-  
-  _checkLastAction(params) {
-    if (Date.now() - this._lastAction.timestamp < 1000
-        && _.isEqual(params, this._lastAction.params)
-        && !params.force) {
-      return false;
-    } else {
-      this._lastAction = {params, timestamp: Date.now()};
-      return true;
-    }
-  }
-  
+
   push(params = {}) {
-    if(!this._checkLastAction({method: 'push', passProps: params.passProps, screen: params.screen})) {
-      return;
-    }
     return NavigationSpecific.push(this, params);
   }
 
@@ -60,9 +41,6 @@ class Navigator {
   }
 
   showModal(params = {}) {
-    if(!this._checkLastAction({method: 'showModal', passProps: params.passProps, screen: params.screen})) {
-      return;
-    }
     return Navigation.showModal(params);
   }
 
@@ -106,6 +84,14 @@ class Navigator {
     return platformSpecific.navigatorSetTitleImage(this, params);
   }
 
+  setStyle(params = {}) {
+    if (Platform.OS === 'ios') {
+      return platformSpecific.navigatorSetStyle(this, params);
+    } else {
+      console.log(`Setting style isn\'t supported on ${Platform.OS} yet`);
+    }
+  }
+
   toggleDrawer(params = {}) {
     return platformSpecific.navigatorToggleDrawer(this, params);
   }
@@ -130,6 +116,10 @@ class Navigator {
     return platformSpecific.showSnackbar(this, params);
   }
 
+  dismissSnackbar() {
+    return platformSpecific.dismissSnackbar();
+  }
+
   showContextualMenu(params, onButtonPressed) {
     return platformSpecific.showContextualMenu(this, params, onButtonPressed);
   }
@@ -143,19 +133,12 @@ class Navigator {
     if (!this.navigatorEventSubscription) {
       let Emitter = Platform.OS === 'android' ? DeviceEventEmitter : NativeAppEventEmitter;
       this.navigatorEventSubscription = Emitter.addListener(this.navigatorEventID, (event) => this.onNavigatorEvent(event));
-      _allNavigatorEventHandlers[this.navigatorEventID] = (event) => this.onNavigatorEvent(event);
+      Navigation.setEventHandler(this.navigatorEventID, (event) => this.onNavigatorEvent(event));
     }
   }
 
   handleDeepLink(params = {}) {
-    if (!params.link) return;
-    const event = {
-      type: 'DeepLink',
-      link: params.link
-    };
-    for (let i in _allNavigatorEventHandlers) {
-      _allNavigatorEventHandlers[i](event);
-    }
+    Navigation.handleDeepLink(params);
   }
 
   onNavigatorEvent(event) {
@@ -167,7 +150,7 @@ class Navigator {
   cleanup() {
     if (this.navigatorEventSubscription) {
       this.navigatorEventSubscription.remove();
-      delete _allNavigatorEventHandlers[this.navigatorEventID];
+      Navigation.clearEventHandler(this.navigatorEventID);
     }
   }
 }

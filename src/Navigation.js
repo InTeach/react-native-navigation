@@ -7,15 +7,16 @@ import Screen from './Screen';
 import PropRegistry from './PropRegistry';
 
 const registeredScreens = {};
+const _allNavigatorEventHandlers = {};
 
 function registerScreen(screenID, generator) {
   registeredScreens[screenID] = generator;
   AppRegistry.registerComponent(screenID, generator);
 }
 
-function registerComponent(screenID, generator, store = undefined, Provider = undefined) {
+function registerComponent(screenID, generator, store = undefined, Provider = undefined, options = {}) {
   if (store && Provider) {
-    return _registerComponentRedux(screenID, generator, store, Provider);
+    return _registerComponentRedux(screenID, generator, store, Provider, options);
   } else {
     return _registerComponentNoRedux(screenID, generator);
   }
@@ -24,6 +25,10 @@ function registerComponent(screenID, generator, store = undefined, Provider = un
 function _registerComponentNoRedux(screenID, generator) {
   const generatorWrapper = function() {
     const InternalComponent = generator();
+    if (!InternalComponent) {
+      console.error(`Navigation: ${screenID} registration result is 'undefined'`);
+    }
+    
     return class extends Screen {
       static navigatorStyle = InternalComponent.navigatorStyle || {};
       static navigatorButtons = InternalComponent.navigatorButtons || {};
@@ -52,7 +57,7 @@ function _registerComponentNoRedux(screenID, generator) {
   return generatorWrapper;
 }
 
-function _registerComponentRedux(screenID, generator, store, Provider) {
+function _registerComponentRedux(screenID, generator, store, Provider, options) {
   const generatorWrapper = function() {
     const InternalComponent = generator();
     return class extends Screen {
@@ -74,7 +79,7 @@ function _registerComponentRedux(screenID, generator, store, Provider) {
 
       render() {
         return (
-          <Provider store={store}>
+          <Provider store={store} {...options}>
             <InternalComponent testID={screenID} navigator={this.navigator} {...this.state.internalProps} />
           </Provider>
         );
@@ -130,6 +135,25 @@ function startSingleScreenApp(params) {
   return platformSpecific.startSingleScreenApp(params);
 }
 
+function setEventHandler(navigatorEventID, eventHandler) {
+  _allNavigatorEventHandlers[navigatorEventID] = eventHandler;
+}
+
+function clearEventHandler(navigatorEventID) {
+  delete _allNavigatorEventHandlers[navigatorEventID];
+}
+
+function handleDeepLink(params = {}) {
+  if (!params.link) return;
+  const event = {
+    type: 'DeepLink',
+    link: params.link
+  };
+  for (let i in _allNavigatorEventHandlers) {
+    _allNavigatorEventHandlers[i](event);
+  }
+}
+
 export default {
   getRegisteredScreen,
   registerComponent,
@@ -141,5 +165,8 @@ export default {
   showInAppNotification: showInAppNotification,
   dismissInAppNotification: dismissInAppNotification,
   startTabBasedApp: startTabBasedApp,
-  startSingleScreenApp: startSingleScreenApp
+  startSingleScreenApp: startSingleScreenApp,
+  setEventHandler: setEventHandler,
+  clearEventHandler: clearEventHandler,
+  handleDeepLink: handleDeepLink
 };

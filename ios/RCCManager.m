@@ -194,7 +194,7 @@
   {
     UIViewController *splashVC = [[UIViewController alloc] init];
     splashVC.view = splashView;
-    
+    splashVC.view.backgroundColor = [UIColor colorWithRed:0.37 green:0.76 blue:0.65 alpha:1.0];
     id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
     appDelegate.window.rootViewController = splashVC;
     [appDelegate.window makeKeyAndVisible];

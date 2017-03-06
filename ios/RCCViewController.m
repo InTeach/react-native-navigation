@@ -185,6 +185,7 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
     [self setStyleOnDisappear];
 }
 
+
 // most styles should be set here since when we pop a view controller that changed them
 // we want to reset the style to what we expect (so we need to reset on every willAppear)
 - (void)setStyleOnAppear
@@ -569,6 +570,12 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
     }
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+
+
 #pragma mark - NewRelic
 
 - (NSString*) customNewRelicInteractionName
@@ -591,6 +598,5 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
     
     return interactionName;
 }
-
 
 @end

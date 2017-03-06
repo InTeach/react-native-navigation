@@ -48,22 +48,6 @@ NSString const *CALLBACK_ASSOCIATED_ID = @"RCCNavigationController.CALLBACK_ASSO
 }
 
 
-- (BOOL)shouldAutorotate {
-  if(self.visibleViewController.title != nil){
-    return NO;
-  }
-  if(self.topViewController.shouldAutorotate == TRUE){
-    return TRUE;
-  }
-  return NO;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-  if(self.visibleViewController.title != nil){
-    return UIInterfaceOrientationMaskLandscape;
-  }
-  return UIInterfaceOrientationMaskPortrait;
-}
 
 
 - (UIInterfaceOrientationMask)navigationControllerSupportedInterfaceOrientations:(UINavigationController *)navigationController {

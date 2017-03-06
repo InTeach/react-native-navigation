@@ -2,6 +2,7 @@ package com.reactnativenavigation.controllers;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;

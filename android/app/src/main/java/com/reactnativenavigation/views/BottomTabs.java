@@ -35,9 +35,7 @@ public class BottomTabs extends AHBottomNavigation {
     }
 
     public void setStyleFromScreen(StyleParams params) {
-        if (params.bottomTabsColor.hasColor()) {
-            setBackgroundColor(params.bottomTabsColor);
-        }
+        setBackgroundColor(params.bottomTabsColor);
         if (params.bottomTabsButtonColor.hasColor()) {
             setInactiveColor(params.bottomTabsButtonColor.getColor());
         }
@@ -45,8 +43,8 @@ public class BottomTabs extends AHBottomNavigation {
             setAccentColor(params.selectedBottomTabsButtonColor.getColor());
         }
 
-        setForceTitlesDisplay(params.forceTitlesDisplay);
-
+        //setForceTitlesDisplay(params.forceTitlesDisplay);
+        setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
         setVisibility(params.bottomTabsHidden, true);
     }
 

@@ -595,7 +595,9 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
     }
   }
 }
-
+- (BOOL)shouldAutorotate {
+    return NO;
+}
 #pragma mark - NewRelic
 
 - (NSString*) customNewRelicInteractionName

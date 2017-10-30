@@ -128,26 +128,45 @@
     id icon = tabItemLayout[@"props"][@"icon"];
     if (icon)
     {
-      iconImage = [RCTConvert UIImage:icon];
-      if (buttonColor)
-      {
-        iconImage = [[self image:iconImage withColor:buttonColor] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-      }
+      BOOL disableIconTint = tabsStyle[@"tabBarDisableIconTint"];
+            if (disableIconTint) {
+              iconImage = [[RCTConvert UIImage:icon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+            } else {
+              iconImage = [RCTConvert UIImage:icon];
+             if (buttonColor)
+              {
+                iconImage = [[self image:iconImage withColor:buttonColor] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+          }
+    }
     }
     UIImage *iconImageSelected = nil;
     id selectedIcon = tabItemLayout[@"props"][@"selectedIcon"];
+      BOOL disableSelectedIconTint = tabsStyle[@"tabBarDisableSelectedIconTint"];
     if (selectedIcon) {
-      iconImageSelected = [RCTConvert UIImage:selectedIcon];
+      if (disableSelectedIconTint) {
+                iconImageSelected = [[RCTConvert UIImage:selectedIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+              } else {
+                iconImageSelected = [RCTConvert UIImage:selectedIcon];
+              }
     } else {
-      iconImageSelected = [RCTConvert UIImage:icon];
+      if (disableSelectedIconTint) {
+                iconImageSelected = [[RCTConvert UIImage:icon] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+              } else {
+                iconImageSelected = [RCTConvert UIImage:icon];
+              }
     }
     
     viewController.tabBarItem = [[UITabBarItem alloc] initWithTitle:title image:iconImage tag:0];
     viewController.tabBarItem.accessibilityIdentifier = tabItemLayout[@"props"][@"testID"];
     viewController.tabBarItem.selectedImage = iconImageSelected;
-    
+    int offset = 7;
+    NSArray *osVersion = [[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."];
+
     if(!title){
-      int offset = 7;
+      if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && [[osVersion objectAtIndex:0] intValue] >= 11 )
+      {
+        offset = 0;
+      }
       UIEdgeInsets imageInset = UIEdgeInsetsMake(offset, 0, -offset, 0);
       viewController.tabBarItem.imageInsets = imageInset;
     }

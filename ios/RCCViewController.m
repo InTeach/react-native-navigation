@@ -25,6 +25,8 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
 @property (nonatomic) BOOL _disableBackGesture;
 @property (nonatomic, strong) NSDictionary *originalNavBarImages;
 @property (nonatomic, strong) UIImageView *navBarHairlineImageView;
+@property (nonatomic, weak) id <UIGestureRecognizerDelegate> originalInteractivePopGestureDelegate;
+
 @end
 
 @implementation RCCViewController
@@ -469,6 +471,20 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
   } else {
     self.navBarHairlineImageView.hidden = NO;
   }
+  
+  //Bug fix: in case there is a interactivePopGestureRecognizer, it prevents react-native from getting touch events on the left screen area that the gesture handles
+  //overriding the delegate of the gesture prevents this from happening while keeping the gesture intact (another option was to disable it completely by demand)
+  if(self.navigationController.viewControllers.count > 1){
+    if (self.navigationController != nil && self.navigationController.interactivePopGestureRecognizer != nil)
+    {
+      id <UIGestureRecognizerDelegate> interactivePopGestureRecognizer = self.navigationController.interactivePopGestureRecognizer.delegate;
+      if (interactivePopGestureRecognizer != nil && interactivePopGestureRecognizer != self)
+      {
+        self.originalInteractivePopGestureDelegate = interactivePopGestureRecognizer;
+        self.navigationController.interactivePopGestureRecognizer.delegate = self;
+      }
+    }
+  }
 }
 
 -(void)storeOriginalNavBarImages {
@@ -488,6 +504,12 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
 
 -(void)setStyleOnDisappear {
   self.navBarHairlineImageView.hidden = NO;
+  
+  if (self.navigationController != nil && self.navigationController.interactivePopGestureRecognizer != nil && self.originalInteractivePopGestureDelegate != nil)
+  {
+    self.navigationController.interactivePopGestureRecognizer.delegate = self.originalInteractivePopGestureDelegate;
+    self.originalInteractivePopGestureDelegate = nil;
+  }
 }
 
 // only styles that can't be set on willAppear should be set here
@@ -623,7 +645,15 @@ const NSInteger TRANSPARENT_NAVBAR_TAG = 78264803;
 
 #pragma mark - UIGestureRecognizerDelegate
 -(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-  return self._disableBackGesture ? self._disableBackGesture : YES;
+  NSNumber *disabledBackGesture = self.navigatorStyle[@"disabledBackGesture"];
+  BOOL disabledBackGestureBool = disabledBackGesture ? [disabledBackGesture boolValue] : NO;
+  return !disabledBackGestureBool;
+}
+
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+  NSNumber *disabledSimultaneousGesture = self.navigatorStyle[@"disabledSimultaneousGesture"];
+  BOOL disabledSimultaneousGestureBool = disabledSimultaneousGesture ? [disabledSimultaneousGesture boolValue] : YES; // make default value of disabledSimultaneousGesture is true
+  return !disabledSimultaneousGestureBool;
 }
 
 

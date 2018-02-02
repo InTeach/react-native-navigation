@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactMethod;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.params.ActivityParams;
 import com.reactnativenavigation.params.ContextualMenuParams;
@@ -247,7 +248,7 @@ public class NavigationCommandsHandler {
         });
     }
 
-    public static void dismissTopModal() {
+    public static void dismissTopModal(final Promise promise) {
         final NavigationActivity currentActivity = NavigationActivity.currentActivity;
         if (currentActivity == null) {
             return;
@@ -257,12 +258,14 @@ public class NavigationCommandsHandler {
             @Override
             public void run() {
                 currentActivity.dismissTopModal();
+                promise.resolve("true");
             }
         });
     }
-
-    public static void dismissAllModals() {
+    @ReactMethod
+    public static void dismissAllModals(final Promise promise) {
         final NavigationActivity currentActivity = NavigationActivity.currentActivity;
+
         if (currentActivity == null) {
             return;
         }
@@ -270,7 +273,9 @@ public class NavigationCommandsHandler {
         NavigationApplication.instance.runOnMainThread(new Runnable() {
             @Override
             public void run() {
+
                 currentActivity.dismissAllModals();
+                promise.resolve("true");
             }
         });
     }

@@ -183,13 +183,13 @@ public class NavigationReactModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void dismissAllModals() {
-        NavigationCommandsHandler.dismissAllModals();
+    public void dismissAllModals(Promise promise) {
+        NavigationCommandsHandler.dismissAllModals(promise);
     }
 
     @ReactMethod
-    public void dismissTopModal() {
-        NavigationCommandsHandler.dismissTopModal();
+    public void dismissTopModal(Promise promise) {
+        NavigationCommandsHandler.dismissTopModal(promise);
     }
 
     @ReactMethod

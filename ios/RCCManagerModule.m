@@ -141,6 +141,8 @@ RCT_EXPORT_MODULE(RCCManager);
 
 -(void)dismissAllModalPresenters:(NSMutableArray*)allPresentedViewControllers resolver:(RCTPromiseResolveBlock)resolve
 {
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    
     if (allPresentedViewControllers.count > 0)
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),^
@@ -150,7 +152,6 @@ RCT_EXPORT_MODULE(RCCManager);
                            {
                                counter++;
                                
-                               [[RCCManager sharedIntance] unregisterController:viewController];
                                if (viewController.presentedViewController != nil)
                                {
                                    dispatch_semaphore_t dismiss_sema = dispatch_semaphore_create(0);
@@ -159,6 +160,9 @@ RCT_EXPORT_MODULE(RCCManager);
                                                   {
                                                       [viewController dismissViewControllerAnimated:NO completion:^()
                                                        {
+                                                           if (rootViewController != viewController) {
+                                                               [[RCCManager sharedIntance] unregisterController:viewController];
+                                                           }
                                                            if (counter == allPresentedViewControllers.count && allPresentedViewControllers.count > 0)
                                                            {
                                                                [allPresentedViewControllers removeAllObjects];

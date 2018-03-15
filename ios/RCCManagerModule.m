@@ -177,12 +177,15 @@ RCT_EXPORT_MODULE(RCCManager);
                                                   });
                                    
                                    dispatch_semaphore_wait(dismiss_sema, DISPATCH_TIME_FOREVER);
-                               }
-                               else if (counter == allPresentedViewControllers.count && allPresentedViewControllers.count > 0)
-                               {
-                                   [allPresentedViewControllers removeAllObjects];
-                                   
-                                   if (resolve != nil)
+                                } else {
+                                   if (rootViewController != viewController) {
+                                       [[RCCManager sharedIntance] unregisterController:viewController];
+                                   }
+                                   if (counter == allPresentedViewControllers.count && allPresentedViewControllers.count > 0) {
+                               
+                               [allPresentedViewControllers removeAllObjects];
+
+                                      if (resolve != nil)
                                    {
                                        dispatch_async(dispatch_get_main_queue(), ^
                                                       {
@@ -190,6 +193,7 @@ RCT_EXPORT_MODULE(RCCManager);
                                                       });
                                    }
                                }
+                           }
                            }
                        });
     }
